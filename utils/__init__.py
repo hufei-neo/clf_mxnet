@@ -1,4 +1,3 @@
-import re
 import time
 from datetime import timedelta
 
@@ -45,38 +44,6 @@ def get_time_dif(start_time):
     end_time = time.time()
     time_dif = end_time - start_time
     return timedelta(seconds=int(round(time_dif)))
-
-
-def clean_str(row):
-    """
-    clean string input
-    :param row: String
-    input str
-    :return: str
-    """
-    row = str(row).lower().strip()
-    row = re.sub(r"'", "'", row)
-    row = re.sub(r"\s*'\s*", "'", row)
-    _ = []
-    row = list(row)
-    for i, j in enumerate(row):
-        if i > 0 and re.match(r"[^.\d]", j) and re.match(r"[.\d]", row[i - 1]):
-            _.append(" ")
-        if i > 0 and re.match(r"[.\d]", j) and re.match(r"[^.\d]", row[i - 1]):
-            _.append(" ")
-        if i > 0 and re.match(r"[^A-Za-z0-9'.]", j) and re.match(
-                r"[A-Za-z0-9'.]", row[i - 1]):
-            _.append(" ")
-        if i > 0 and re.match(r"[A-Za-z0-9'.]", j) and re.match(
-                r"[^A-Za-z0-9'.]", row[i - 1]):
-            _.append(" ")
-        if i > 0 and re.match(r"[^A-Za-z0-9'.]", j) and re.match(
-                r"[^A-Za-z0-9'.]", row[i - 1]):
-            _.append(" ")
-        _.append(j)
-    row = "".join(_)
-    return re.sub(r"\s+", " ", row).strip()
-
 
 def try_gpu(gpu=False):
     """
