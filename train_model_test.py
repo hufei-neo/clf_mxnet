@@ -16,27 +16,9 @@ print('导入模块成功')
 ctx = mx.cpu()
 batch_size = 128
 
-df = pd.read_excel(r'C:\Users\15581\Documents\上海电信\20_04\datas_211_0407.xlsx')
+df = pd.read_excel(r'C:\Users\15581\Documents\上海电信\20_04\datas_211_0407_jieba.xlsx')
 print('1---读取数据成功')
 
-jieba.load_userdict(r'C:\Users\15581\Documents\上海电信\基本文本停词专词\word_base_now_20200411.txt')
-
-stop_txt = r'C:\Users\15581\Documents\上海电信\基本文本停词专词\stop_word_now_20200411.txt'
-df['文本分词'] = df['通话内容'].apply(seg_sentences,stop_txt=stop_txt)
-
-model = Word2Vec(df['文本分词'], size=250, window=5, min_count=5, workers=4)
-# word_vectors = model.wv 保存word2vec模型以及的词向量
-model.save("word2vec.model")
-model.wv.save_word2vec_format('output_vector_file.txt', binary=False)
-
-df['新文本分词'] = df['文本分词'].apply(clear_dum)
-
-df['concat'] = df.apply(
-    lambda x: x['业务大类'] +
-    x['子产品/服务'] +
-    x['故障处理环节'] +
-    x['问题现象'],
-    axis=1)
 
 # 标签表预处理(y值即label的映射，label的数量) eg：'你好':1  1:'你好'
 label = list(set(df['concat'].tolist()))
@@ -87,7 +69,6 @@ model.collect_params().initialize(mx.init.Xavier(rnd_type="gaussian"), ctx=ctx)
 model.embedding.weight.set_data(weight)
 model.embedding.collect_params().setattr('grad_req', 'null')
 
-df.to_excel(r'C:\Users\15581\Documents\上海电信\20_04\datas_211_0407_jieba.xlsx',index=False)
 
 mask = False
 num_epochs = 10

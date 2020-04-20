@@ -6,6 +6,9 @@ from mxnet import nd
 
 from utils.tokenization import BasicTokenizer
 
+import jieba
+import re
+
 
 def get_text_embedding(embedding_path, pad, bos, eos):
     """
@@ -83,3 +86,30 @@ def process_one_seq(seq_tokens, max_seq_len, PAD, BOS=None, EOS=None):
         add = [PAD] * (max_seq_len - len(seq_tokens))
     seq_tokens += add
     return seq_tokens[0: max_seq_len]
+
+#创建停用词list
+def stopwordslist(filepath):
+    stopwords = [line.strip() for line in open(filepath, 'r', encoding='utf-8').readlines()]
+    return stopwords
+
+#gensim分词
+def seg_sentences(sentence, stop_txt):
+    sentence = re.sub("[0-9\[\`\~\!\@\#\$\^\&\*\(\)\=\|\{\}\'\:\;\'\,\[\]\.\<\>\/\?\~\！\@\#\\\&\*\%]", "", sentence)
+    sentence = re.sub("[\s+\.\!\/_,$%^*(+\"\')]+|[+——()?【】“”！，。★？、~@#￥%……&*（）]+", "",sentence)
+    sentence = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",sentence)
+    sentence_seged = jieba.cut(sentence.strip())
+    stopwords = stopwordslist(stop_txt)
+    word_lis = []
+    for word in sentence_seged:
+        if word not in stopwords and word != '\t':
+            word_lis.append(word)
+    return word_lis
+
+def clear_dum(l):
+    l_=[]
+    for i in range(1,len(l)+1):
+        if i == 1:
+            l_.append(l[i-1])
+        elif l[i-1] not in l[i-3:i-1]:
+            l_.append(l[i-1])
+    return l_
